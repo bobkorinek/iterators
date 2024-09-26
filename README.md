@@ -6,43 +6,130 @@
 
 # PHP Iterators
 
+The PHP Iterators library by [loophp](https://github.com/loophp) offers a
+variety of useful classes to assist developers with iteration-related challenges
+in PHP.
+
 ## Description
 
-The missing PHP iterators.
+PHP provides a lot of functionality related to iterations. We can easily
+implement our own [iterators](https://refactoring.guru/design-patterns/iterator)
+within our code simply by implementing interfaces
+like [`Iterator`](https://www.php.net/manual/en/class.iterator.php) or
+[`IteratorAggregate`](https://www.php.net/manual/en/class.iteratoraggregate.php).
+By implementing these interfaces, we can use the instances of these classes for
+traversing the provided data. This is typically done
+with [`foreach`](https://www.php.net/manual/en/control-structures.foreach.php)
+statement. Iterators bring a lot of possibilities due to their nature. For
+example, we can implement our own iterator class for parsing large amount of
+data inside a file.
+Unlike [array](https://www.php.net/manual/en/language.types.array.php) iterator
+might load just one item at a time meaning we don't have to load the whole
+content of the file into a memory. But unlike array if we decide, let's say,
+reduce all the values inside our iterable into a single value (for array we
+could simply
+use [`array_reduce()`](https://www.php.net/manual/en/function.array-reduce.php)),
+we won't find any help from PHP's native functions/classes.
 
-## Features
+This library helps to address the issue of the missing iterator functionality
+inside PHP. You might
+notice [PHP already has some of the classes for working with iterators](https://www.php.net/manual/en/spl.iterators.php)
+but all these classes are specifically tied to `Iterator` interface, meaning you
+can't use them for
+other [iterables](https://www.php.net/manual/en/language.types.iterable.php) (
+i.e. `array` and `IteratorAggregate`). With this library you can easily use some
+the iterator-related logic for any `iterable` type.
 
-- `CachingIteratorAggregate`
-- `ChunkIterableAggregate`
-- `ClosureIterator`:
-  `ClosureIterator(callable $callable, array $arguments = [])`
-- `ClosureIteratorAggregate`:
-  `ClosureIteratorAggregate(callable $callable, array $arguments = [])`
-- `ConcatIterableAggregate`
-- `FilterIterableAggregate`
-- `InterruptableIterableIteratorAggregate`:
-  `InterruptableIterableIteratorAggregate(iterable $iterable)`
-- `IterableIterator`: `IterableIterator(iterable $iterable)`
-- `IterableIteratorAggregate`: `IterableIteratorAggregate(iterable $iterable)`
-- `MapIterableAggregate`
-- `MersenneTwisterRNGIteratorAggregate`
-- `MultipleIterableAggregate`
-- `PackIterableAggregate`
-- `PausableIteratorAggregate`
-- `RandomIterableAggregate`
-- `RecursiveIterableAggregate`
-- `ReductionIterableAggregate`
-- `ResourceIteratorAggregate`
-- `SimpleCachingIteratorAggregate`
-- `SortIterableAggregate`
-- `StringIteratorAggregate`
-- `TypedIterableAggregate`
-- `UniqueIterableAggregate`
-- `UnpackIterableAggregate`
+Although the library provides many useful classes it might be a bit impractical
+if you try use many of them at once or if you are dealing with a complex
+situation requiring a lot of iterator related work. For this reason you might
+consider using [`loophp/collection`](https://github.com/loophp/collection)
+library.
 
 ## Installation
 
-`composer require loophp/iterators`
+To use this library you can simply install it
+with [Composer](https://getcomposer.org/):
+
+```shell
+composer require loophp/iterators
+```
+
+## Features
+
+| Class                                                                               | Description                                                   |
+|-------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| [`CachingIteratorAggregate`](#cachingiteratoraggregate)                             | Iterator that implements caching for iterators.               |
+| [`ChunkIterableAggregate`](#chunkiterableaggregate)                                 | Iterator that chunks iterable items.                          |
+| [`ClosureIterator`](#closureiterator)                                               | Iterator that uses a closure for iteration.                   |
+| [`ClosureIteratorAggregate`](#closureiteratoraggregate)                             | Iterator for iterators using closures.                        |
+| [`ConcatIterableAggregate`](#concatiterableaggregate)                               | Iterator that concatenates multiple iterables.                |
+| [`FilterIterableAggregate`](#filteriterableaggregate)                               | Iterator that filters elements from an iterable.              |
+| [`InterruptableIterableIteratorAggregate`](#interruptableiterableiteratoraggregate) | Iterator allowing interruption of iteration.                  |
+| [`IterableIterator`](#iterableiterator)                                             | Base iterator that works with iterable objects.               |
+| [`IterableIteratorAggregate`](#iterableiteratoraggregate)                           | Iterator for iterable iterators.                              |
+| [`MapIterableAggregate`](#mapiterableaggregate)                                     | Iterator that maps functions over an iterable.                |
+| [`MersenneTwisterRNGIteratorAggregate`](#mersennetwisterrngiteratoraggregate)       | Iterator providing Mersenne Twister random number generation. |
+| [`MultipleIterableAggregate`](#multipleiterableaggregate)                           | Iterator that supports multiple iterable sources.             |
+| [`PackIterableAggregate`](#packiterableaggregate)                                   | Iterator that packs elements from iterables.                  |
+| [`PausableIteratorAggregate`](#pausableiteratoraggregate)                           | Iterator that allows pausing of iteration.                    |
+| [`RandomIterableAggregate`](#randomiterableaggregate)                               | Iterator that provides random elements from iterables.        |
+| [`RecursiveIterableAggregate`](#recursiveiterableaggregate)                         | Iterator that recursively iterates through nested iterables.  |
+| [`ReductionIterableAggregate`](#reductioniterableaggregate)                         | Iterator that reduces iterables to a single value.            |
+| [`ResourceIteratorAggregate`](#resourceiteratoraggregate)                           | Iterator for iterators based on resources.                    |
+| [`SimpleCachingIteratorAggregate`](#simplecachingiteratoraggregate)                 | Basic caching mechanism for iterators.                        |
+| [`SortIterableAggregate`](#sortiterableaggregate)                                   | Iterator that sorts elements of an iterable.                  |
+| [`StringIteratorAggregate`](#stringiteratoraggregate)                               | Iterator that iterates over strings.                          |
+| [`TypedIterableAggregate`](#typediterableaggregate)                                 | Iterator enforcing types for iterable elements.               |
+| [`UniqueIterableAggregate`](#uniqueiterableaggregate)                               | Iterator that yields unique elements from an iterable.        |
+| [`UnpackIterableAggregate`](#unpackiterableaggregate)                               | Iterator that unpacks elements from nested iterables.         |
+
+## Why use iterators?
+
+Many times we simple use `array` in our code to work with collections of values.
+In this example we want to multiply all of the values inside the provided array
+with chosen number.
+
+```php
+function multiply(array $numbers, int $value): array {
+    return array_map(
+        fn (int $number): int => $number * $value,
+        $numbers
+    );
+}
+```
+
+This work well, but unfortunately this code is coupled to arrays even though
+this type of operation (i.e. mapping collection of values) can be easily done
+for any traversable value. If we want to support `iterable` type, we need to
+rewrite this function.
+
+```php
+function multiply(iterable $numbers, int $value): array {
+    return array_map(
+        fn (int $number): int => $number * $value,
+        iterator_to_array($numbers)
+    );
+}
+```
+
+Now this code works even if we pass `Iterator` or `IteratorAggregate` but there
+is catch: this function converts _any_ `iterable` type into array. This might
+not seem as a problem at first, but if we pass large set of numbers we might see
+performance problems. There are two main problems here:
+
+1. __We load all the values from the `iterable` variable into our memory__. If
+   the variable contains an iterator accessing some large data sets we might
+   lose a lot of memory due to this.
+2. __There is unnecessary iteration over the `iterable` variable__. When
+   calling `iterator_to_array()`, the function needs to iterate over
+   the `iterable` variable to access the whole set of values to convert it into
+   an array. If the user of the `multiply()` function decides to use the result
+   to use it once simply for displaying all the number to console, there will 3
+   iterations in total (first: `iterator_to_array`, second: `array_map`,
+   third: `foreach` for displaying the numbers). The user might decide that this
+   is a great burden for performance, so they might decide to simply rewrite the
+   function within their `foreach` statement that displays the numbers.
 
 ## Usage
 
@@ -51,8 +138,8 @@ The missing PHP iterators.
 Let you cache any iterator. You then get [\Generators][49] rewindable for free.
 
 This implementation does not use internal state to keep track of the current
-position of the iterator. The underlying mechanism is based on [SPL
-\CachingIterator][48].
+position of the iterator. The underlying mechanism is based
+on [SPL \CachingIterator][48].
 
 The pros of using that iterator is **performance**. It's blazing fast, it cannot
 compare to any other stateful custom implementations.
@@ -425,33 +512,55 @@ See [CHANGELOG.md][43] for a changelog based on [git commits][44].
 For more detailed changelogs, please check [the release changelogs][45].
 
 [1]: https://packagist.org/packages/loophp/iterators
+
 [2]: https://github.com/loophp/iterators/actions
+
 [4]: https://shepherd.dev/github/loophp/iterators
+
 [5]: https://github.com/sponsors/drupol
+
 [6]: https://github.com/loophp/iterators/graphs/contributors
+
 [latest stable version]:
-  https://img.shields.io/packagist/v/loophp/iterators.svg?style=flat-square
+https://img.shields.io/packagist/v/loophp/iterators.svg?style=flat-square
+
 [github stars]:
-  https://img.shields.io/github/stars/loophp/iterators.svg?style=flat-square
+https://img.shields.io/github/stars/loophp/iterators.svg?style=flat-square
+
 [total downloads]:
-  https://img.shields.io/packagist/dt/loophp/iterators.svg?style=flat-square
+https://img.shields.io/packagist/dt/loophp/iterators.svg?style=flat-square
+
 [github workflow status]:
-  https://img.shields.io/github/actions/workflow/status/loophp/iterators/tests.yml?branch=main&style=flat-square
+https://img.shields.io/github/actions/workflow/status/loophp/iterators/tests.yml?branch=main&style=flat-square
+
 [type coverage]:
-  https://img.shields.io/badge/dynamic/json?style=flat-square&color=color&label=Type%20coverage&query=message&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Floophp%2Fiterators%2Fcoverage
+https://img.shields.io/badge/dynamic/json?style=flat-square&color=color&label=Type%20coverage&query=message&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Floophp%2Fiterators%2Fcoverage
+
 [license]:
-  https://img.shields.io/packagist/l/loophp/iterators.svg?style=flat-square
+https://img.shields.io/packagist/l/loophp/iterators.svg?style=flat-square
+
 [donate github]:
-  https://img.shields.io/badge/Sponsor-Github-brightgreen.svg?style=flat-square
+https://img.shields.io/badge/Sponsor-Github-brightgreen.svg?style=flat-square
+
 [donate paypal]:
-  https://img.shields.io/badge/Sponsor-Paypal-brightgreen.svg?style=flat-square
+https://img.shields.io/badge/Sponsor-Paypal-brightgreen.svg?style=flat-square
+
 [34]: https://github.com/loophp/iterators/issues
+
 [35]: https://www.phpunit.de/
+
 [36]: https://github.com/phpro/grumphp
+
 [38]: https://github.com/phpstan/phpstan
+
 [39]: https://github.com/vimeo/psalm
+
 [43]: https://github.com/loophp/iterators/blob/main/CHANGELOG.md
+
 [44]: https://github.com/loophp/iterators/commits/main
+
 [45]: https://github.com/loophp/iterators/releases
+
 [48]: https://www.php.net/cachingiterator
+
 [49]: https://www.php.net/generator
